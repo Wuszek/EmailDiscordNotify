@@ -55,14 +55,16 @@ class Mailer:
                         print(self.last_subject + " is the last new email. Finishing now")
                         return
                     else:
-                        msg_email = re.findall(r"\<(.*?)\>", msg["From"])
-                        print("OD: " + msg_email[0], "Subject: " + msg["Subject"])
-                        subject = msg["Subject"]
+                        # msg_email = re.findall(r"\<(.*?)\>", msg["From"])
+                        # print(f'OD: {msg_email} Subject: {msg["Subject"]}')
+                        sender = make_header(decode_header(msg["From"]))
+                        subject = make_header(decode_header(msg["Subject"]))
+                        print(f'FROM: {sender} \t SUBJECT: {subject}'.expandtabs(70))
 
                         command = f'./discord.sh \
                                     --username "Username" \
                                     --avatar "https://avatarlink.com/logo.png" \
-                                    --text "**FROM: {msg_email[0]}** \\nSUBJECT: {subject}"'
+                                    --text "**FROM: {sender}** \\nSUBJECT: {subject}"'
 
                         os.popen(command)
                         count = count + 1
