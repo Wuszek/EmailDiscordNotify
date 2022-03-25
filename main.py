@@ -2,6 +2,7 @@ import imaplib
 import email
 import os
 import re
+import time
 import requests
 
 """
@@ -66,6 +67,7 @@ class Mailer:
                                     --avatar "https://avatarlink.com/logo.png" \
                                     --text "**FROM: {sender}** \\nSUBJECT: {subject}"'
 
+                        time.wait(1)
                         os.popen(command)
                         count = count + 1
 
