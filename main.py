@@ -58,8 +58,8 @@ class Mailer:
                     else:
                         # msg_email = re.findall(r"\<(.*?)\>", msg["From"])
                         # print(f'OD: {msg_email} Subject: {msg["Subject"]}')
-                        sender = make_header(decode_header(msg["From"]))
                         subject = make_header(decode_header(msg["Subject"]))
+                        sender = str(make_header(decode_header(msg["From"]))).replace('"', '')
                         print(f'FROM: {sender} \t SUBJECT: {subject}'.expandtabs(70))
 
                         command = f'./discord.sh \
