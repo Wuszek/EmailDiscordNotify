@@ -67,7 +67,7 @@ class Mailer:
                                     --avatar "https://avatarlink.com/logo.png" \
                                     --text "**FROM: {sender}** \\nSUBJECT: {subject}"'
 
-                        time.wait(1)
+                        time.sleep(2)
                         os.popen(command)
                         count = count + 1
 
