@@ -1,7 +1,6 @@
 import imaplib
 import email
 import os
-import re
 import time
 import requests
 
@@ -21,7 +20,7 @@ def getFiles():
         os.popen('chmod +x discord.sh').read()
         print("File 'discord.sh' downloaded. Proceeding...")
     if os.path.isfile('.webhook'):
-        print(".webhook file fund! Proceeding...")
+        print(".webhook file found! Proceeding...")
     else:
         exit("No .webhook file. Create one with webhook url inside.")
     return
@@ -34,8 +33,18 @@ class Mailer:
         self.last_subject = "DO NOT REMOVE"
         self.username = "username"
         self.password = "password"
-        self.imap = imaplib.IMAP4_SSL("imap.gmail.com")
-        self.result = self.imap.login(self.username, self.password)
+        try:
+            self.imap = imaplib.IMAP4_SSL("imap.gmail.com")
+            self.result = self.imap.login(self.username, self.password)
+        except Exception as e:
+            print(f"Caught exception {e}")
+            command = f'./discord.sh \
+                        --username "Username" \
+                        --avatar "https://avatarlink.com/logo.png" \
+                        --text "**ERROR : ** {e}"'
+
+            time.sleep(2)
+            os.popen(command)
 
     def checkMail(self):
         self.imap.select('Inbox', True)
@@ -47,7 +56,17 @@ class Mailer:
     def sendInfo(self):
         count = 0
         while True:
-            latest_email_number = self.checkMail()
+            try:
+                latest_email_number = self.checkMail()
+            except Exception as e:
+                print(f"Caught exception {e}")
+                command = f'./discord.sh \
+                            --username "Username" \
+                            --avatar "https://avatarlink.com/logo.png" \
+                            --text "**ERROR : ** {e}"'
+
+                time.sleep(2)
+                os.popen(command)
             res, msg = self.imap.fetch(str(latest_email_number - count), "(RFC822)")
             for response in msg:
                 if isinstance(response, tuple):
@@ -56,8 +75,6 @@ class Mailer:
                         print(self.last_subject + " is the last new email. Finishing now")
                         return
                     else:
-                        # msg_email = re.findall(r"\<(.*?)\>", msg["From"])
-                        # print(f'OD: {msg_email} Subject: {msg["Subject"]}')
                         subject = make_header(decode_header(msg["Subject"]))
                         sender = str(make_header(decode_header(msg["From"]))).replace('"', '')
                         print(f'FROM: {sender} \t SUBJECT: {subject}'.expandtabs(70))
