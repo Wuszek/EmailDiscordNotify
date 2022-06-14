@@ -9,23 +9,6 @@ Leave one email with given subject and do not remove it! Leave it unread.
 """
 
 
-def getFiles():
-    if os.path.isfile('discord.sh'):
-        print("File 'discord.sh' already exists. Proceeding...")
-    else:
-        filename = "discord.sh"
-        url = 'https://raw.githubusercontent.com/ChaoticWeg/discord.sh/master/discord.sh'
-        f = requests.get(url)
-        open(filename, 'wb').write(f.content)
-        os.popen('chmod +x discord.sh').read()
-        print("File 'discord.sh' downloaded. Proceeding...")
-    if os.path.isfile('.webhook'):
-        print(".webhook file found! Proceeding...")
-    else:
-        exit("No .webhook file. Create one with webhook url inside.")
-    return
-
-
 class Mailer:
     def __init__(self):
         self.response = None
@@ -86,6 +69,5 @@ class Mailer:
                         count = count + 1
 
 
-getFiles()
 notify = Mailer()
 notify.sendInfo()
