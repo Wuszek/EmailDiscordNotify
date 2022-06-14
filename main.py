@@ -33,18 +33,17 @@ class Mailer:
         self.last_subject = "DO NOT REMOVE"
         self.username = "username"
         self.password = "password"
+        self.webhook = "webhook_url"
         try:
             self.imap = imaplib.IMAP4_SSL("imap.gmail.com")
             self.result = self.imap.login(self.username, self.password)
         except Exception as e:
-            print(f"Caught exception {e}")
-            command = f'./discord.sh \
-                        --username "Username" \
-                        --avatar "https://avatarlink.com/logo.png" \
-                        --text "**ERROR : ** {e}"'
-
+            print(f"Exception occurred: {e}")
             time.sleep(2)
-            os.popen(command)
+            try:
+                requests.post(self.webhook, data=f"**ERROR : ** {e}")
+            except Exception as e:
+                exit(f"Exception occurred: {e}")
 
     def checkMail(self):
         self.imap.select('Inbox', True)
@@ -59,14 +58,13 @@ class Mailer:
             try:
                 latest_email_number = self.checkMail()
             except Exception as e:
-                print(f"Caught exception {e}")
-                command = f'./discord.sh \
-                            --username "Username" \
-                            --avatar "https://avatarlink.com/logo.png" \
-                            --text "**ERROR : ** {e}"'
-
+                print(f"Exception occurred: {e}")
                 time.sleep(2)
-                os.popen(command)
+                try:
+                    requests.post(self.webhook, data=f"**ERROR : ** {e}")
+                except Exception as e:
+                    exit(f"Exception occurred: {e}")
+
             res, msg = self.imap.fetch(str(latest_email_number - count), "(RFC822)")
             for response in msg:
                 if isinstance(response, tuple):
@@ -78,14 +76,13 @@ class Mailer:
                         subject = make_header(decode_header(msg["Subject"]))
                         sender = str(make_header(decode_header(msg["From"]))).replace('"', '')
                         print(f'FROM: {sender} \t SUBJECT: {subject}'.expandtabs(70))
-
-                        command = f'./discord.sh \
-                                    --username "Username" \
-                                    --avatar "https://avatarlink.com/logo.png" \
-                                    --text "**FROM: {sender}** \\nSUBJECT: {subject}"'
-
+                        payload = f"**FROM: {sender}** \\nSUBJECT: {subject}"
                         time.sleep(2)
-                        os.popen(command)
+                        try:
+                            requests.post(self.webhook, data=payload)
+                        except Exception as e:
+                            print(f"Exception occurred: {e}")
+                            pass
                         count = count + 1
 
 
