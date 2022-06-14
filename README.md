@@ -15,12 +15,11 @@ or something like this ;)
 ### Change init settings
  ```python 
  def __init__(self):
-    self.response = None
-    self.messages = None
     self.last_subject = "DO NOT REMOVE"
     self.username = "username"
     self.password = "password"
     self.webhook = "webhook_url"
+    self.bot_username = "Username"
     self.imap = imaplib.IMAP4_SSL("imap.gmail.com")
     self.result = self.imap.login(self.username, self.password)
 ``` 

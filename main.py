@@ -17,6 +17,7 @@ class Mailer:
         self.username = "username"
         self.password = "password"
         self.webhook = "webhook_url"
+        self.bot_username = "Username"
         try:
             self.imap = imaplib.IMAP4_SSL("imap.gmail.com")
             self.result = self.imap.login(self.username, self.password)
@@ -24,7 +25,7 @@ class Mailer:
             print(f"Exception occurred: {e}")
             time.sleep(2)
             try:
-                payload = {'username': 'Username', "content": f"**ERROR : ** {e}"}
+                payload = {'username': {self.bot_username}, "content": f"**ERROR : ** {e}"}
                 requests.post(self.webhook, data=payload)
             except Exception as e:
                 exit(f"Exception occurred: {e}")
@@ -45,7 +46,7 @@ class Mailer:
                 print(f"Exception occurred: {e}")
                 time.sleep(2)
                 try:
-                    payload = {'username': 'Username', "content": f"**ERROR : ** {e}"}
+                    payload = {'username': {self.bot_username}, "content": f"**ERROR : ** {e}"}
                     requests.post(self.webhook, data=payload)
                 except Exception as e:
                     exit(f"Exception occurred: {e}")
@@ -63,7 +64,7 @@ class Mailer:
                         print(f'FROM: {sender} \t SUBJECT: {subject}'.expandtabs(70))
 
                         content = f"**FROM: {sender}** \nSUBJECT: {subject}"
-                        payload = {'username': 'Username', "content": {content}}
+                        payload = {'username': {self.bot_username}, "content": {content}}
 
                         time.sleep(2)
                         try:
