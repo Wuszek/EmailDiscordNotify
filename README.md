@@ -34,7 +34,8 @@ or something like this ;)
 
 ### Update Discord bot command 
 ``` python
-payload = f"**FROM: {sender}** \\nSUBJECT: {subject}"
+content = f"**FROM: {sender}** \nSUBJECT: {subject}"
+payload = {'username': 'Username', "content": {content}}
 ```
 ### Run script
 

@@ -1,8 +1,8 @@
 import imaplib
 import email
-import os
 import time
 import requests
+from email.header import make_header, decode_header
 
 """
 Leave one email with given subject and do not remove it! Leave it unread. 
@@ -24,7 +24,8 @@ class Mailer:
             print(f"Exception occurred: {e}")
             time.sleep(2)
             try:
-                requests.post(self.webhook, data=f"**ERROR : ** {e}")
+                payload = {'username': 'Username', "content": f"**ERROR : ** {e}"}
+                requests.post(self.webhook, data=payload)
             except Exception as e:
                 exit(f"Exception occurred: {e}")
 
@@ -44,7 +45,8 @@ class Mailer:
                 print(f"Exception occurred: {e}")
                 time.sleep(2)
                 try:
-                    requests.post(self.webhook, data=f"**ERROR : ** {e}")
+                    payload = {'username': 'Username', "content": f"**ERROR : ** {e}"}
+                    requests.post(self.webhook, data=payload)
                 except Exception as e:
                     exit(f"Exception occurred: {e}")
 
@@ -59,7 +61,10 @@ class Mailer:
                         subject = make_header(decode_header(msg["Subject"]))
                         sender = str(make_header(decode_header(msg["From"]))).replace('"', '')
                         print(f'FROM: {sender} \t SUBJECT: {subject}'.expandtabs(70))
-                        payload = f"**FROM: {sender}** \\nSUBJECT: {subject}"
+
+                        content = f"**FROM: {sender}** \nSUBJECT: {subject}"
+                        payload = {'username': 'Username', "content": {content}}
+
                         time.sleep(2)
                         try:
                             requests.post(self.webhook, data=payload)
