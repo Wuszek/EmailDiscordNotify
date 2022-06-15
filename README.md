@@ -1,6 +1,6 @@
 # EmailDiscordNotify
 This is simple tool, to automatically check for new email on mailbox and send 
-notifications to Discord channel. It could be usefull to watch over some spam/old account, that
+notifications to Discord channel. It could be useful to watch over some spam/old account, that
 you do not want to connect to private mailbox/outlook/phone.
 
 ## How to use 
@@ -15,11 +15,11 @@ or something like this ;)
 ### Change init settings
  ```python 
  def __init__(self):
-    self.response = None
-    self.messages = None
     self.last_subject = "DO NOT REMOVE"
     self.username = "username"
     self.password = "password"
+    self.webhook = "webhook_url"
+    self.bot_username = "Username"
     self.imap = imaplib.IMAP4_SSL("imap.gmail.com")
     self.result = self.imap.login(self.username, self.password)
 ``` 
@@ -27,16 +27,14 @@ or something like this ;)
 - Fill rest of settings with username, password and your mailbox imap address.
 - Script will check for unread emails everytime from the top of mailbox and stop on setu-up last subject.
 
-### Create .webhook file 
-- Create bot and webhook no Discord channel.
-- Create `.webhook` file and fill it with webhook url.
+### Create discord bot and update webhook constant 
+- Create bot and webhook on Discord channel.
+- Update webhook constant in main.py.
 
 ### Update Discord bot command 
 ``` python
-command = f'./discord.sh \
-            --username "Bot username" \
-            --avatar "Bot avatar link" \
-            --text "**FROM: {sender}** \\nSUBJECT: {subject}"'
+content = f"**FROM: {sender}** \nSUBJECT: {subject}"
+payload = {'username': 'Username', "content": {content}}
 ```
 ### Run script
 

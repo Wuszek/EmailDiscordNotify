@@ -1,29 +1,12 @@
 import imaplib
 import email
-import os
 import time
 import requests
+from email.header import make_header, decode_header
 
 """
 Leave one email with given subject and do not remove it! Leave it unread. 
 """
-
-
-def getFiles():
-    if os.path.isfile('discord.sh'):
-        print("File 'discord.sh' already exists. Proceeding...")
-    else:
-        filename = "discord.sh"
-        url = 'https://raw.githubusercontent.com/ChaoticWeg/discord.sh/master/discord.sh'
-        f = requests.get(url)
-        open(filename, 'wb').write(f.content)
-        os.popen('chmod +x discord.sh').read()
-        print("File 'discord.sh' downloaded. Proceeding...")
-    if os.path.isfile('.webhook'):
-        print(".webhook file found! Proceeding...")
-    else:
-        exit("No .webhook file. Create one with webhook url inside.")
-    return
 
 
 class Mailer:
@@ -33,18 +16,19 @@ class Mailer:
         self.last_subject = "DO NOT REMOVE"
         self.username = "username"
         self.password = "password"
+        self.webhook = "webhook_url"
+        self.bot_username = "Username"
         try:
             self.imap = imaplib.IMAP4_SSL("imap.gmail.com")
             self.result = self.imap.login(self.username, self.password)
         except Exception as e:
-            print(f"Caught exception {e}")
-            command = f'./discord.sh \
-                        --username "Username" \
-                        --avatar "https://avatarlink.com/logo.png" \
-                        --text "**ERROR : ** {e}"'
-
+            print(f"Exception occurred: {e}")
             time.sleep(2)
-            os.popen(command)
+            try:
+                payload = {'username': {self.bot_username}, "content": f"**ERROR : ** {e}"}
+                requests.post(self.webhook, data=payload)
+            except Exception as e:
+                exit(f"Exception occurred: {e}")
 
     def checkMail(self):
         self.imap.select('Inbox', True)
@@ -59,14 +43,14 @@ class Mailer:
             try:
                 latest_email_number = self.checkMail()
             except Exception as e:
-                print(f"Caught exception {e}")
-                command = f'./discord.sh \
-                            --username "Username" \
-                            --avatar "https://avatarlink.com/logo.png" \
-                            --text "**ERROR : ** {e}"'
-
+                print(f"Exception occurred: {e}")
                 time.sleep(2)
-                os.popen(command)
+                try:
+                    payload = {'username': {self.bot_username}, "content": f"**ERROR : ** {e}"}
+                    requests.post(self.webhook, data=payload)
+                except Exception as e:
+                    exit(f"Exception occurred: {e}")
+
             res, msg = self.imap.fetch(str(latest_email_number - count), "(RFC822)")
             for response in msg:
                 if isinstance(response, tuple):
@@ -79,16 +63,17 @@ class Mailer:
                         sender = str(make_header(decode_header(msg["From"]))).replace('"', '')
                         print(f'FROM: {sender} \t SUBJECT: {subject}'.expandtabs(70))
 
-                        command = f'./discord.sh \
-                                    --username "Username" \
-                                    --avatar "https://avatarlink.com/logo.png" \
-                                    --text "**FROM: {sender}** \\nSUBJECT: {subject}"'
+                        content = f"**FROM: {sender}** \nSUBJECT: {subject}"
+                        payload = {'username': {self.bot_username}, "content": {content}}
 
                         time.sleep(2)
-                        os.popen(command)
+                        try:
+                            requests.post(self.webhook, data=payload)
+                        except Exception as e:
+                            print(f"Exception occurred: {e}")
+                            pass
                         count = count + 1
 
 
-getFiles()
 notify = Mailer()
 notify.sendInfo()
